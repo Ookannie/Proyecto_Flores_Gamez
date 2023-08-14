@@ -56,7 +56,9 @@ ROOT_URLCONF = 'Proyecto_Flores_Gamez.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': ['dashboard/template'],
+        'DIRS': ['dashboard/template',
+                 'Proyecto_Flores_Gamez/template'
+                 ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -123,7 +125,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "dashboard/static")
+    os.path.join(BASE_DIR, "Proyecto_Flores_Gamez/static")
 
 ]
 
