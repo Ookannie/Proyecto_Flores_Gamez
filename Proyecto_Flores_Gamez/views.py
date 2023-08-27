@@ -1,6 +1,7 @@
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 import json
+from . import users_service
 
 def saludo(request):
     return HttpResponse("Hola mundo")
@@ -38,8 +39,16 @@ def register(request):
         # Convertir el diccionario en un JSON
         user_json = json.dumps(user_data)
 
-        # Redirigir a una página de éxito o realizar alguna otra acción
-        return render(request, "register.html", {"user_json": user_json})
+        # Enviar los datos a Flask
+        response = users_service.create_user(user_data)
+
+        if response.status_code == 201:
+            # Éxito: redirigir a una página de éxito o realizar alguna otra acción
+            return redirect('dashboard')
+        else:
+            # Manejar el caso de error
+            return render(request, "register.html", {"error_message": "Error al enviar el registro"})
+
 
     return render(request, "register.html")
 
