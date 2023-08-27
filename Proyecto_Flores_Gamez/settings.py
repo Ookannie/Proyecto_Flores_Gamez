@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'dashboard'
+    'dashboard',
+    'channels'
 ]
 
 MIDDLEWARE = [
@@ -74,7 +75,19 @@ TEMPLATES = [
     },
 ]
 
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
+}
+
 WSGI_APPLICATION = 'Proyecto_Flores_Gamez.wsgi.application'
+
+# Use channels layer for routing
+ASGI_APPLICATION = 'Proyecto_Flores_Gamez.application'
 
 
 # Database
