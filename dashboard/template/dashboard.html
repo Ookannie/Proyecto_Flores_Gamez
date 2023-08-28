@@ -201,7 +201,7 @@
                         <li class="nav-item dropdown no-arrow">
                             <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Douglas McGee</span>
+                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">Michel Kotry</span>
                                 <img class="img-profile rounded-circle"
                                     src="img/undraw_profile.svg">
                             </a>
@@ -326,7 +326,18 @@
                     <!-- Content Row -->
 
                     <div class="row">
-
+                        <div class="row">
+                            <div class="col-md-12">
+                                <form method="post">
+                                    {% csrf_token %}
+                                    <div class="form-group">
+                                        <label for="intervalo">Intervalo de Tiempo (ticks)</label>
+                                        <input type="number" class="form-control" id="intervalo" name="intervalo">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary">Actualizar Intervalo</button>
+                                </form>
+                            </div>
+                        </div>
                         <!-- Area Chart -->
                         <div class="col-md-12">
                             <div class="card shadow mb-4">
@@ -339,20 +350,12 @@
                                             data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
                                         </a>
-                                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in"
-                                            aria-labelledby="dropdownMenuLink">
-                                            <div class="dropdown-header">Dropdown Header:</div>
-                                            <a class="dropdown-item" href="#">Action</a>
-                                            <a class="dropdown-item" href="#">Another action</a>
-                                            <div class="dropdown-divider"></div>
-                                            <a class="dropdown-item" href="#">Something else here</a>
-                                        </div>
                                     </div>
                                 </div>
                                 <!-- Card Body -->
-                                <div class="card-body">
-                                    <!-- Card Body -->
+                                <div class="card-body" id="plot_bpm">
                                     {{ plot_bpm_html|safe }}
+                                    
                                 </div>
                             </div>
                         </div>
@@ -364,17 +367,17 @@
                                 <div class="card-header">
                                     Alertas de Taquicardia
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body" id="plot_taq">
                                     {{ plot_taq_html|safe }}
                                 </div>
                             </div>
                         </div>
                         <div class="col-md-6">
                             <div class="card mb-4">
-                                <div class="card-header">
+                                <div class="card-header" >
                                     Alertas de Bradicardia
                                 </div>
-                                <div class="card-body">
+                                <div class="card-body" id="plot_bra">
                                     {{ plot_bra_html|safe }}
                                 </div>
                             </div>
@@ -432,4 +435,55 @@
         </div>
     </div>
 
+
+
 {% endblock content %}
+
+{% block script %}
+
+<script>
+    var socket = new WebSocket('ws://127.0.0.1:8000/ws/ecg/');
+
+    socket.onopen = function(event) {
+        console.log("WebSocket is open now.");
+    };
+
+    socket.onerror = function(event) {
+        console.error("WebSocket error observed:", event);
+    };
+
+    socket.onmessage = function(e) {
+    var rawData = JSON.parse(e.data);
+    var data = JSON.parse(rawData.data); 
+    
+    console.log("Data received: ", data);
+
+    if (data.value && data.timestamp) {
+        var valueNumber = parseFloat(data.value);
+        var timestamp = new Date(data.timestamp * 1000);
+        updateGraph('plot_bpm', valueNumber, timestamp);
+    }
+};
+
+
+    socket.onclose = function(e) {
+        console.error('WebSocket closed unexpectedly');
+    };
+
+    function updateGraph(graphID, value, date) {
+        Plotly.extendTraces(graphID, {
+            y: [[value]],
+            x: [[date]]
+        }, [0]);
+    }
+
+    
+</script>
+{% endblock script %}
+
+
+
+
+
+
+

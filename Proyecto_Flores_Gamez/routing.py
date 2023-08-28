@@ -3,7 +3,7 @@ from django.urls import path
 from dashboard import consumers
 
 websocket_urlpatterns = [
-    path('ws/ecg/', consumers.DataConsumer.as_asgi()),
+    path('ws/ecg/', consumers.ECGConsumer.as_asgi()),
 ]
 
 application = ProtocolTypeRouter({
